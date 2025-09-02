@@ -1,0 +1,53 @@
+<div class="quiz-container" style="margin-top: 20px">
+  <h2>QCM – Biologie Végétale Part 2</h2>
+
+  <!-- ✅ Scoreboard always visible -->
+  <div class="scoreboard">
+    ✅ Correct: {{ score }} / {{ quizData.length }} <br />
+    ❌ Wrong: {{ wrong }} / {{ quizData.length }}
+  </div>
+
+  <div *ngIf="!finished; else endQuiz">
+    <!-- Question -->
+    <div class="question">
+      {{ currentQuiz + 1 }} - {{ quizData[currentQuiz].question }}
+    </div>
+
+    <!-- Options -->
+    <div class="answers">
+      <label
+        *ngFor="let opt of quizData[currentQuiz].options"
+        [ngClass]="{
+          correct: showAnswers && opt.key === quizData[currentQuiz].correct,
+          wrong: showAnswers && opt.key === selectedAnswer && opt.key !== quizData[currentQuiz].correct
+        }"
+      >
+        <input
+          type="radio"
+          name="answer"
+          [value]="opt.key"
+          [(ngModel)]="selectedAnswer"
+          [disabled]="showAnswers"
+        />
+        {{ opt.key.toUpperCase() }} - {{ opt.text }}
+      </label>
+    </div>
+
+    <!-- Buttons -->
+    <div class="actions">
+      <button (click)="showResult()" [disabled]="showAnswers">
+        Voir la réponse
+      </button>
+      <button (click)="nextQuestion()" [disabled]="!selectedAnswer">
+        Question suivante
+      </button>
+    </div>
+  </div>
+
+  <!-- ✅ End quiz results -->
+  <ng-template #endQuiz>
+    <h3>Résultat final</h3>
+    <p>✅ Correct: {{ score }} / {{ quizData.length }}</p>
+    <p>❌ Wrong: {{ wrong }} / {{ quizData.length }}</p>
+  </ng-template>
+</div>
