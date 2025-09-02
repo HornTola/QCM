@@ -9,9 +9,7 @@
 
   <div *ngIf="!finished; else endQuiz">
     <!-- Question -->
-    <div class="question">
-      {{ currentQuiz + 1 }} - {{ quizData[currentQuiz].question }}
-    </div>
+    <div class="question">{{ quizData[currentQuiz].question }}</div>
 
     <!-- Options -->
     <div class="answers">

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-declare const Swal: any;
+import Swal from 'sweetalert2';
 
 interface Question {
   question: string;
@@ -16,14 +16,13 @@ interface Question {
   templateUrl: './biologie.html',
   styleUrls: ['./biologie.css']
 })
-export class Biologie {
+export class Biologie implements OnInit {
   currentQuiz = 0;
-  score = 0;   // ✅ correct
-  wrong = 0;   // ✅ wrong
+  score = 0;
+  wrong = 0;
   selectedAnswer: string | null = null;
   finished = false;
   showAnswers = false;
-
 
   quizData: Question[] = [
     {
@@ -1839,6 +1838,9 @@ export class Biologie {
   }
 
   showResult() {
+    // Prevent double counting
+    if (this.showAnswers) return;
+
     if (!this.selectedAnswer) {
       Swal.fire({
         title: 'Attention!',
@@ -1849,44 +1851,46 @@ export class Biologie {
       return;
     }
 
+    // Mark as evaluated
     this.showAnswers = true;
 
-    // ✅ check correct / wrong
+    // Update score or wrong count
     if (this.selectedAnswer === this.quizData[this.currentQuiz].correct) {
       this.score++;
     } else {
       this.wrong++;
     }
 
-    const progress = {
+    // Save progress
+    localStorage.setItem('quizProgress', JSON.stringify({
       currentQuiz: this.currentQuiz,
       score: this.score,
       wrong: this.wrong
-    };
-
-    localStorage.setItem('quizProgress', JSON.stringify(progress));
+    }));
   }
 
   nextQuestion() {
-    if (!this.selectedAnswer) {
-      alert('Veuillez sélectionner une réponse avant de continuer !');
-      return;
+    // If user hasn't clicked "Voir la réponse", count the answer first
+    if (!this.showAnswers) {
+      this.showResult();
+      if (!this.showAnswers) return; // stop if still no answer
     }
 
+    // Move to next question
     this.currentQuiz++;
     this.selectedAnswer = null;
     this.showAnswers = false;
 
+    // Check if quiz finished
     if (this.currentQuiz >= this.quizData.length) {
       this.finished = true;
     }
 
-    const progress = {
+    // Save progress
+    localStorage.setItem('quizProgress', JSON.stringify({
       currentQuiz: this.currentQuiz,
       score: this.score,
       wrong: this.wrong
-    };
-
-    localStorage.setItem('quizProgress', JSON.stringify(progress));
+    }));
   }
 }
